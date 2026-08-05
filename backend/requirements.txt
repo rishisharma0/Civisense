@@ -1,0 +1,46 @@
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Environment variables
+python-dotenv
+
+# LangChain
+langchain
+langchain-community
+langchain-core
+langchain-groq
+
+# LLM
+groq
+
+# PDF Processing
+pypdf
+pdfplumber
+
+# NLP
+spacy
+keybert
+sentence-transformers
+
+# Sentiment Analysis
+transformers
+torch
+
+# Data Processing
+pandas
+numpy
+
+# Visualization
+wordcloud
+matplotlib
+
+# Validation
+pydantic
+
+# HTTP Requests
+httpx
+
+# Optional Database
+sqlalchemy
+psycopg2-binary
