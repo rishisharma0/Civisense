@@ -1,4 +1,5 @@
 fastapi
+fastapi[standard]
 uvicorn[standard]
 python-multipart
 
@@ -37,6 +38,7 @@ matplotlib
 
 # Validation
 pydantic
+pydantic_settings
 
 # HTTP Requests
 httpx
@@ -44,3 +46,7 @@ httpx
 # Optional Database
 sqlalchemy
 psycopg2-binary
+psycopg[binary]
+
+#Alembic
+Alembic
