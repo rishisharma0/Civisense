@@ -1,8 +1,8 @@
 from datetime import datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, ForeignKey, Text, text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -11,20 +11,20 @@ from app.db.base import Base
 class Analysis(Base):
     __tablename__ = "analyses"
 
-    id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True),
+    id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
         primary_key=True,
         default=uuid4,
     )
 
-    document_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True),
+    document_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
         ForeignKey(
             "documents.id",
             ondelete="CASCADE",
         ),
         nullable=False,
-        unique=True,  # one analysis per document
+        unique=True,
     )
 
     overall_summary: Mapped[str] = mapped_column(

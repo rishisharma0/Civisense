@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 14c9ed5ccb4b
+Revision ID: 29457e191a54
 Revises: 
-Create Date: 2026-08-06 20:59:04.284467
+Create Date: 2026-08-07 18:37:18.565521
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '14c9ed5ccb4b'
+revision: str = '29457e191a54'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,8 +24,9 @@ def upgrade() -> None:
     op.create_table('documents',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('filename', sa.String(length=255), nullable=False),
-    sa.Column('file_path', sa.String(length=255), nullable=False),
-    sa.Column('uploaded_at', sa.DateTime(), nullable=False),
+    sa.Column('original_filename', sa.String(length=255), nullable=False),
+    sa.Column('file_path', sa.Text(), nullable=False),
+    sa.Column('uploaded_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('file_path')
     )
@@ -45,9 +46,9 @@ def upgrade() -> None:
     sa.Column('document_id', sa.UUID(), nullable=False),
     sa.Column('stakeholder_type', sa.String(length=255), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('topic', sa.String(length=255), nullable=False),
-    sa.Column('raw_issue', sa.String(length=255), nullable=False),
-    sa.Column('canonical_issue', sa.String(length=255), nullable=False),
+    sa.Column('topic', sa.String(length=255), nullable=True),
+    sa.Column('raw_issue', sa.String(length=255), nullable=True),
+    sa.Column('canonical_issue', sa.String(length=255), nullable=True),
     sa.Column('clause', sa.String(length=255), nullable=True),
     sa.Column('sentiment', sa.String(length=50), nullable=False),
     sa.Column('recommendation', sa.Text(), nullable=True),

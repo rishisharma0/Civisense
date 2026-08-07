@@ -1,8 +1,8 @@
 from datetime import datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Text, String, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, ForeignKey, String, Text, text
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -11,14 +11,14 @@ from app.db.base import Base
 class Comment(Base):
     __tablename__ = "comments"
 
-    id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True),
+    id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
         primary_key=True,
         default=uuid4,
     )
 
-    document_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=True),
+    document_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
         ForeignKey(
             "documents.id",
             ondelete="CASCADE",
@@ -36,19 +36,19 @@ class Comment(Base):
         nullable=False,
     )
 
-    topic: Mapped[str] = mapped_column(
+    topic: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
-    raw_issue: Mapped[str] = mapped_column(
+    raw_issue: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
-    canonical_issue: Mapped[str] = mapped_column(
+    canonical_issue: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
     clause: Mapped[str | None] = mapped_column(
