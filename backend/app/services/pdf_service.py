@@ -1,11 +1,12 @@
-from uuid import UUID, uuid4
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from uuid import UUID, uuid4
+
+from fastapi import HTTPException, UploadFile
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
+
 from app.models.document import Document
-from fastapi import UploadFile
-from fastapi import HTTPException
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)

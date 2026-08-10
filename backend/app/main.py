@@ -9,5 +9,5 @@ def health():
 
 app.include_router(
     document_router,
-    prefix="/api/v1"
+    prefix="/api/"
 )
