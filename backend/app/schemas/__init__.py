@@ -17,3 +17,8 @@ from app.schemas.dashboard import (  # noqa: F401
     StakeholderBreakdown,
     TopicBreakdown,
 )
+from app.schemas.batch import (  # noqa: F401
+    BatchUploadResponse,
+    BatchStatusResponse,
+    BatchJobListItem,
+)

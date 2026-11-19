@@ -35,6 +35,7 @@ class PDFService:
             filename=unique_name,
             original_filename=file.filename or "consultation.pdf",
             file_path=str(filepath),
+            status="pending",
             uploaded_at=datetime.utcnow(),
         )
 
@@ -57,6 +58,7 @@ class PDFService:
                 "document_id": document.id,
                 "filename": document.original_filename,
                 "stored_filename": document.filename,
+                "status": document.status or ("analyzed" if document.analysis else "pending"),
                 "uploaded_at": document.uploaded_at,
             }
             for document in documents
@@ -71,6 +73,7 @@ class PDFService:
             "document_id": document.id,
             "filename": document.original_filename,
             "stored_filename": document.filename,
+            "status": document.status or ("analyzed" if document.analysis else "pending"),
             "uploaded_at": document.uploaded_at,
         }
 

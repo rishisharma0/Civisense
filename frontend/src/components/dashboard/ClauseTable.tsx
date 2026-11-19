@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ClauseStat } from "@/types/analysis";
-import { Scale, ChevronRight } from "lucide-react";
+import { Scale, ChevronRight, Filter } from "lucide-react";
 
 interface ClauseTableProps {
   clauses: ClauseStat[];
@@ -16,110 +16,116 @@ export const ClauseTable: React.FC<ClauseTableProps> = ({
   onSelectClause,
 }) => {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+      {/* Titlebar */}
+      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-6 py-3.5 text-xs">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <Scale className="h-4 w-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">
-              Clause-Level Intelligence
-            </h3>
-            <p className="text-xs text-slate-400">
-              Specific sections, provisions, and rules cited in stakeholder submissions
-            </p>
-          </div>
+          <Scale className="h-4 w-4 text-slate-700" />
+          <span className="font-bold text-slate-900">
+            Clause-by-Clause Statutory Analysis
+          </span>
         </div>
-        {selectedClause && (
-          <button
-            onClick={() => onSelectClause(null)}
-            className="text-xs text-emerald-400 hover:underline"
-          >
-            Clear Filter
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-500">
+            Tracked Provisions: {clauses.length}
+          </span>
+          {selectedClause && (
+            <button
+              onClick={() => onSelectClause(null)}
+              className="text-xs text-blue-700 hover:text-blue-900 font-semibold underline"
+            >
+              Reset Filter
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-slate-800 text-slate-400">
-              <th className="pb-2.5 font-medium">Provision / Clause</th>
-              <th className="pb-2.5 font-medium text-center">Mentions</th>
-              <th className="pb-2.5 font-medium">Sentiment Split</th>
-              <th className="pb-2.5 font-medium">Stance</th>
-              <th className="pb-2.5 font-medium text-right">Action</th>
+            <tr className="border-b border-slate-200 bg-slate-50/50 text-[11px] font-semibold text-slate-600">
+              <th className="py-3 px-6">Statutory Clause / Provision</th>
+              <th className="py-3 px-4 text-center">Submissions</th>
+              <th className="py-3 px-4">Sentiment Distribution</th>
+              <th className="py-3 px-4">Dominant Stance</th>
+              <th className="py-3 px-6 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
-            {clauses.map((c) => {
-              const isSelected = selectedClause === c.clause;
-              const posPct = (c.positive / c.mention_count) * 100;
-              const neuPct = (c.neutral / c.mention_count) * 100;
-              const negPct = (c.negative / c.mention_count) * 100;
+          <tbody className="divide-y divide-slate-100">
+            {clauses.map((clause, idx) => {
+              const total = clause.positive + clause.neutral + clause.negative;
+              const posPct = total > 0 ? Math.round((clause.positive / total) * 100) : 0;
+              const neuPct = total > 0 ? Math.round((clause.neutral / total) * 100) : 0;
+              const negPct = total > 0 ? Math.round((clause.negative / total) * 100) : 0;
+              const isSelected = selectedClause === clause.clause;
 
               return (
                 <tr
-                  key={c.clause}
-                  onClick={() => onSelectClause(isSelected ? null : c.clause)}
+                  key={idx}
+                  onClick={() =>
+                    onSelectClause(isSelected ? null : clause.clause)
+                  }
                   className={`cursor-pointer transition ${
                     isSelected
-                      ? "bg-emerald-500/10 text-emerald-300"
-                      : "hover:bg-slate-800/50 text-slate-300"
+                      ? "bg-blue-50/60 font-medium"
+                      : "hover:bg-slate-50"
                   }`}
                 >
-                  <td className="py-3 font-semibold text-white flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    {c.clause}
-                  </td>
-                  <td className="py-3 text-center font-bold text-slate-200">
-                    {c.mention_count}
-                  </td>
-                  <td className="py-3 w-40">
-                    <div className="flex h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        className="bg-emerald-500"
-                        style={{ width: `${posPct}%` }}
-                        title={`Positive: ${c.positive}`}
-                      />
-                      <div
-                        className="bg-amber-500"
-                        style={{ width: `${neuPct}%` }}
-                        title={`Neutral: ${c.neutral}`}
-                      />
-                      <div
-                        className="bg-rose-500"
-                        style={{ width: `${negPct}%` }}
-                        title={`Negative: ${c.negative}`}
-                      />
+                  <td className="py-3.5 px-6 font-semibold text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                      <span>{clause.clause}</span>
                     </div>
                   </td>
-                  <td className="py-3">
+                  <td className="py-3.5 px-4 text-center text-slate-700 font-medium">
+                    {clause.mention_count}
+                  </td>
+                  <td className="py-3.5 px-4 min-w-[140px]">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-full flex rounded-full overflow-hidden bg-slate-100">
+                        <div
+                          style={{ width: `${posPct}%` }}
+                          className="bg-emerald-500"
+                          title={`Support: ${posPct}%`}
+                        />
+                        <div
+                          style={{ width: `${neuPct}%` }}
+                          className="bg-slate-400"
+                          title={`Neutral: ${neuPct}%`}
+                        />
+                        <div
+                          style={{ width: `${negPct}%` }}
+                          className="bg-rose-500"
+                          title={`Concerns: ${negPct}%`}
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-500 shrink-0 font-medium">
+                        {posPct}% / {negPct}%
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
                     <span
-                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold border ${
-                        c.dominant_sentiment === "positive"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : c.dominant_sentiment === "negative"
-                          ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                          : "bg-slate-800 text-slate-300 border-slate-700"
+                      className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold ${
+                        posPct > negPct
+                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                          : negPct > posPct
+                          ? "bg-rose-50 text-rose-800 border border-rose-200"
+                          : "bg-slate-100 text-slate-700 border border-slate-200"
                       }`}
                     >
-                      {c.dominant_sentiment === "negative"
-                        ? "Friction Point"
-                        : c.dominant_sentiment === "positive"
-                        ? "Supported"
-                        : "Mixed Feedback"}
+                      {posPct > negPct
+                        ? "Broad Support"
+                        : negPct > posPct
+                        ? "Friction Observed"
+                        : "Mixed Stance"}
                     </span>
                   </td>
-                  <td className="py-3 text-right">
-                    <button
-                      className={`p-1 rounded transition ${
-                        isSelected ? "text-emerald-400" : "text-slate-500 hover:text-white"
-                      }`}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
+                  <td className="py-3.5 px-6 text-right">
+                    <span className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 font-medium">
+                      <span>View Submissions</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </span>
                   </td>
                 </tr>
               );

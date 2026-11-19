@@ -54,13 +54,14 @@ class AnalysisService:
         stakeholder_summary = await LLMService.generate_stakeholder_summary(clustered_comments)
         consensus = await LLMService.generate_consensus(clustered_comments)
 
-        # 8. Save Analysis record
+        # 8. Save Analysis record and update document status
         analysis = Analysis(
             document_id=document.id,
             overall_summary=overall or "",
             stakeholder_summary=stakeholder_summary or {},
             consensus=consensus or {},
         )
+        document.status = "analyzed"
 
         try:
             db.add(analysis)

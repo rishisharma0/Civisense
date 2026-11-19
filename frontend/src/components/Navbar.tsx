@@ -1,155 +1,107 @@
 "use client";
 
 import React from "react";
-import { DocumentItem } from "@/types/analysis";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  FileText,
-  Upload,
-  Sparkles,
-  ChevronDown,
-  Trash2,
-  CheckCircle2,
-  AlertCircle,
+  Building2,
+  Layers,
+  UploadCloud,
+  FileCheck2,
 } from "lucide-react";
 
 interface NavbarProps {
-  documents: DocumentItem[];
-  selectedDocId: string | null;
-  onSelectDoc: (id: string) => void;
-  onOpenUpload: () => void;
-  onLoadSample: () => void;
-  onDeleteDoc: (id: string) => void;
-  backendOnline: boolean;
-  isAnalyzing: boolean;
+  pendingCount?: number;
+  backendOnline?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  documents,
-  selectedDocId,
-  onSelectDoc,
-  onOpenUpload,
-  onLoadSample,
-  onDeleteDoc,
-  backendOnline,
-  isAnalyzing,
+  pendingCount = 0,
+  backendOnline = true,
 }) => {
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
-  const currentDoc = documents.find((d) => d.document_id === selectedDocId);
+  const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-[#0b0f19]/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20">
-            <Sparkles className="h-5 w-5" />
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white shadow-2xs">
+      {/* Official Government Top Bar */}
+      <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-1.5 text-xs text-zinc-600 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-zinc-900">CiviSense</span>
+            <span className="text-zinc-400">•</span>
+            <span>Public Consultation & Legislative Feedback Intelligence System</span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold tracking-tight text-white">
-                Civi<span className="text-emerald-400">Sense</span>
-              </span>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                v1.0 AI
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs">
+              <span
+                className={`h-2 w-2 rounded-xs ${
+                  backendOnline ? "bg-emerald-600" : "bg-rose-500"
+                }`}
+              />
+              <span className="font-medium text-zinc-800">
+                {backendOnline ? "System Active" : "System Offline"}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
-              Legislative Consultation & Stakeholder Analytics
-            </p>
           </div>
         </div>
+      </div>
 
-        {/* Center: Document selector */}
-        <div className="flex items-center gap-3">
-          {documents.length > 0 && (
-            <div className="relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-slate-700 hover:bg-slate-800"
-              >
-                <FileText className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="max-w-[160px] truncate sm:max-w-[220px]">
-                  {currentDoc ? currentDoc.filename : "Select Consultation"}
-                </span>
-                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-              </button>
-
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-xl border border-slate-800 bg-slate-900 p-1.5 shadow-2xl backdrop-blur-xl z-50">
-                  <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                    Consultation Documents
-                  </div>
-                  <div className="max-h-60 overflow-y-auto space-y-1">
-                    {documents.map((doc) => (
-                      <div
-                        key={doc.document_id}
-                        className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition ${
-                          doc.document_id === selectedDocId
-                            ? "bg-emerald-500/15 text-emerald-300 font-medium border border-emerald-500/30"
-                            : "text-slate-300 hover:bg-slate-800"
-                        }`}
-                      >
-                        <button
-                          onClick={() => {
-                            onSelectDoc(doc.document_id);
-                            setDropdownOpen(false);
-                          }}
-                          className="flex items-center gap-2 truncate text-left flex-1"
-                        >
-                          <FileText className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                          <span className="truncate">{doc.filename}</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteDoc(doc.document_id);
-                          }}
-                          title="Delete document"
-                          className="text-slate-500 hover:text-rose-400 p-1 transition"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+      {/* Main Navbar */}
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand & Portal Choice */}
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-none bg-zinc-900 text-white shadow-2xs">
+              <Building2 className="h-4 w-4" />
             </div>
-          )}
-        </div>
+            <div>
+              <span className="text-sm font-bold tracking-tight text-zinc-950">
+                CiviSense
+              </span>
+              <span className="ml-2 border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-700">
+                Official Portal
+              </span>
+            </div>
+          </Link>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2.5">
-          {/* Backend Status indicator */}
-          <div
-            className="hidden md:flex items-center gap-1.5 rounded-full border border-slate-800/80 bg-slate-900/60 px-2.5 py-1 text-[11px] text-slate-400"
-            title={backendOnline ? "Backend is running and connected" : "Backend unreachable"}
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                backendOnline ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
+          {/* Navigation Links - Lera box style */}
+          <nav className="flex items-center gap-1">
+            <Link
+              href="/"
+              className={`flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium transition ${
+                pathname === "/"
+                  ? "border-zinc-900 bg-zinc-900 text-white font-semibold"
+                  : "border-transparent text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
               }`}
-            />
-            <span>{backendOnline ? "Engine Ready" : "Connecting..."}</span>
-          </div>
+            >
+              <UploadCloud className="h-3.5 w-3.5" />
+              <span>Submit Consultation PDF</span>
+            </Link>
 
-          <button
-            onClick={onLoadSample}
-            disabled={isAnalyzing}
-            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white disabled:opacity-50"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            <span>Load Demo PDF</span>
-          </button>
+            <Link
+              href="/batch"
+              className={`flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium transition relative ${
+                pathname === "/batch"
+                  ? "border-zinc-900 bg-zinc-900 text-white font-semibold"
+                  : "border-transparent text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>Government Batch Processing</span>
+              {pendingCount > 0 && (
+                <span className="ml-1 bg-amber-500 px-1.5 py-0.2 text-[10px] font-bold text-white">
+                  {pendingCount}
+                </span>
+              )}
+            </Link>
+          </nav>
+        </div>
 
-          <button
-            onClick={onOpenUpload}
-            disabled={isAnalyzing}
-            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-3.5 py-1.5 text-xs font-semibold text-slate-950 shadow-md shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50"
-          >
-            <Upload className="h-3.5 w-3.5" />
-            <span>Upload PDF</span>
-          </button>
+        {/* Right Info */}
+        <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-600">
+          <span className="border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium">
+            Database: SQLite (civisense.db)
+          </span>
         </div>
       </div>
     </header>

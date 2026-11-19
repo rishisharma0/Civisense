@@ -7,6 +7,10 @@ echo "=========================================="
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# 0. Ensure PostgreSQL Container is running
+echo "Ensuring PostgreSQL container is up..."
+docker compose -f "$ROOT_DIR/backend/docker-compose.yml" up -d 2>/dev/null || true
+
 # 1. Start Backend
 echo "Starting Backend on http://localhost:8000..."
 cd "$ROOT_DIR/backend"

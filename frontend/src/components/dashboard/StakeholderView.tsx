@@ -25,34 +25,31 @@ export const StakeholderView: React.FC<StakeholderViewProps> = ({
   onSelectStakeholder,
 }) => {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+      {/* Titlebar */}
+      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-6 py-3.5 text-xs">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400">
-            <Users className="h-4 w-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">
-              Stakeholder Perspectives
-            </h3>
-            <p className="text-xs text-slate-400">
-              Summaries and sentiment distribution categorized by professional body
-            </p>
-          </div>
+          <Users className="h-4 w-4 text-slate-700" />
+          <span className="font-bold text-slate-900">
+            Stakeholder Perspectives & Representation
+          </span>
         </div>
         {selectedStakeholder && (
           <button
             onClick={() => onSelectStakeholder(null)}
-            className="text-xs text-teal-400 hover:underline"
+            className="text-xs text-blue-700 hover:text-blue-900 font-semibold underline"
           >
-            Show All Groups
+            Show All Stakeholder Groups
           </button>
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {stakeholders.map((s) => {
           const isSelected = selectedStakeholder === s.stakeholder_type;
+          const total = s.positive + s.negative + s.neutral;
+          const posPct = total > 0 ? Math.round((s.positive / total) * 100) : 0;
+          const negPct = total > 0 ? Math.round((s.negative / total) * 100) : 0;
 
           return (
             <div
@@ -60,40 +57,72 @@ export const StakeholderView: React.FC<StakeholderViewProps> = ({
               onClick={() =>
                 onSelectStakeholder(isSelected ? null : s.stakeholder_type)
               }
-              className={`cursor-pointer rounded-xl border p-4 transition ${
+              className={`cursor-pointer rounded-xl border p-4 transition flex flex-col justify-between ${
                 isSelected
-                  ? "border-teal-500/50 bg-teal-500/10 shadow-lg shadow-teal-500/10"
-                  : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/80"
+                  ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                  : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-teal-400">
-                  <div className="p-1.5 rounded-lg bg-slate-800">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                      isSelected
+                        ? "bg-slate-800 text-white"
+                        : "bg-slate-100 text-slate-700"
+                    }`}
+                  >
                     {getStakeholderIcon(s.stakeholder_type)}
                   </div>
-                  <span className="text-xs font-semibold text-white truncate">
-                    {s.stakeholder_type}
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
+                      isSelected
+                        ? "bg-slate-800 text-slate-200"
+                        : "bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    {s.count} Submissions
                   </span>
                 </div>
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300">
-                  {s.count} {s.count === 1 ? "comment" : "comments"}
-                </span>
+
+                <div>
+                  <h4
+                    className={`text-sm font-bold tracking-tight ${
+                      isSelected ? "text-white" : "text-slate-900"
+                    }`}
+                  >
+                    {s.stakeholder_type}
+                  </h4>
+                  <p
+                    className={`text-xs line-clamp-2 mt-1 leading-relaxed ${
+                      isSelected ? "text-slate-300" : "text-slate-600"
+                    }`}
+                  >
+                    {s.summary || "General consultation feedback"}
+                  </p>
+                </div>
               </div>
 
-              {s.summary ? (
-                <p className="mt-2 text-xs leading-relaxed text-slate-300 line-clamp-3">
-                  {s.summary}
-                </p>
-              ) : (
-                <p className="mt-2 text-xs text-slate-400 italic">
-                  Representations submitted regarding compliance timelines and procedures.
-                </p>
-              )}
-
-              <div className="mt-3 flex items-center justify-between text-[11px] border-t border-slate-800/80 pt-2 text-slate-400">
-                <span className="text-emerald-400">{s.positive} pos</span>
-                <span className="text-amber-400">{s.neutral} neu</span>
-                <span className="text-rose-400">{s.negative} neg</span>
+              {/* Sentiment Pill Bar */}
+              <div className="pt-4 mt-3 border-t border-slate-100/30">
+                <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
+                  <span className={isSelected ? "text-slate-400" : "text-slate-500"}>
+                    Support / Concern:
+                  </span>
+                  <span className={isSelected ? "text-emerald-400 font-bold" : "text-emerald-700 font-bold"}>
+                    {posPct}% / {negPct}%
+                  </span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-200/50 overflow-hidden flex">
+                  <div
+                    style={{ width: `${posPct}%` }}
+                    className="bg-emerald-500"
+                  />
+                  <div
+                    style={{ width: `${negPct}%` }}
+                    className="bg-rose-500"
+                  />
+                </div>
               </div>
             </div>
           );

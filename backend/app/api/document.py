@@ -18,6 +18,7 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(ge
     return {
         "document_id": document.id,
         "filename": document.original_filename,
+        "status": document.status,
         "uploaded_at": document.uploaded_at,
     }
 

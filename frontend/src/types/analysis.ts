@@ -1,6 +1,7 @@
 export interface DocumentItem {
   document_id: string;
   filename: string;
+  status?: string;
   uploaded_at: string;
   stored_filename?: string;
 }
@@ -59,6 +60,45 @@ export interface ConsensusData {
   agreements?: string[];
   disagreements?: string[];
   recommendations?: string[];
+}
+
+export interface BatchUploadResponse {
+  job_id: string;
+  status: string;
+  total_files: number;
+  message: string;
+  created_at: string;
+}
+
+export interface BatchSummary {
+  total_comments: number;
+  total_documents: number;
+  sentiment_distribution: Record<string, number>;
+  stakeholder_breakdown: Record<string, number>;
+  top_topics: TopicBreakdown[];
+  top_canonical_issues: { issue: string; count: number }[];
+  consensus: ConsensusData;
+}
+
+export interface BatchStatusResponse {
+  job_id: string;
+  status: "queued" | "processing" | "completed" | "failed";
+  total_files: number;
+  processed_files: number;
+  progress_percentage: number;
+  current_step: string;
+  document_ids: string[];
+  documents?: Array<{
+    document_id: string;
+    filename: string;
+    status: string;
+    total_comments?: number;
+    uploaded_at?: string;
+  }>;
+  error_message?: string | null;
+  batch_summary?: BatchSummary | null;
+  created_at: string;
+  completed_at?: string | null;
 }
 
 export interface DashboardData {

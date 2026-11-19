@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DashboardData, DocumentItem } from "@/types/analysis";
+import { DashboardData, DocumentItem, BatchUploadResponse, BatchStatusResponse } from "@/types/analysis";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
@@ -78,6 +78,71 @@ export const api = {
     const response = await apiClient.get<DashboardData>(
       `/dashboard/${documentId}`
     );
+    return response.data;
+  },
+
+  /**
+   * Upload multiple consultation PDFs for background batch processing
+   */
+  async uploadBatch(files: File[]): Promise<BatchUploadResponse> {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await apiClient.post<BatchUploadResponse>(
+      "/batch/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  },
+
+  /**
+   * Poll real-time progress and status of a batch job
+   */
+  async getBatchStatus(jobId: string): Promise<BatchStatusResponse> {
+    const response = await apiClient.get<BatchStatusResponse>(
+      `/batch/${jobId}/status`
+    );
+    return response.data;
+  },
+
+  /**
+   * Fetch unanalyzed citizen submissions pending in the database
+   */
+  async getPendingSubmissions(): Promise<{
+    pending_count: number;
+    documents: Array<{
+      document_id: string;
+      filename: string;
+      status: string;
+      uploaded_at: string;
+    }>;
+  }> {
+    const response = await apiClient.get("/batch/pending");
+    return response.data;
+  },
+
+  /**
+   * Trigger batch processing on all pending citizen submissions in DB
+   */
+  async processPendingSubmissions(): Promise<BatchUploadResponse> {
+    const response = await apiClient.post<BatchUploadResponse>(
+      "/batch/process-pending"
+    );
+    return response.data;
+  },
+
+  /**
+   * List previous batch analysis jobs
+   */
+  async listBatches(): Promise<Array<{ job_id: string; status: string; total_files: number; processed_files: number; current_step: string; created_at: string; completed_at?: string | null }>> {
+    const response = await apiClient.get("/batch/");
     return response.data;
   },
 };

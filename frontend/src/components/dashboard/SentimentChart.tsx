@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { Smile, Frown, MinusCircle } from "lucide-react";
+import { BarChart3, Smile, Frown, MinusCircle } from "lucide-react";
 
 interface SentimentChartProps {
   overview: SentimentOverview;
@@ -21,141 +21,112 @@ export const SentimentChart: React.FC<SentimentChartProps> = ({ overview }) => {
       name: "Positive Support",
       value: overview.positive,
       pct: overview.positive_pct,
-      color: "#10b981", // Emerald 500
+      color: "#059669", // Emerald-600
     },
     {
       name: "Neutral / Inquiries",
       value: overview.neutral,
       pct: overview.neutral_pct,
-      color: "#f59e0b", // Amber 500
+      color: "#64748b", // Slate-500
     },
     {
-      name: "Concerns / Negative",
+      name: "Concerns / Friction",
       value: overview.negative,
       pct: overview.negative_pct,
-      color: "#f43f5e", // Rose 500
+      color: "#e11d48", // Rose-600
     },
   ];
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg flex flex-col justify-between">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <div>
-          <h3 className="text-sm font-semibold text-white">
-            Stakeholder Sentiment Breakdown
-          </h3>
-          <p className="text-xs text-slate-400">
-            Automated sentiment classification & confidence weighting
-          </p>
+    <div className="rounded-xl border border-slate-200 bg-white shadow-xs flex flex-col justify-between overflow-hidden">
+      {/* Titlebar */}
+      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-6 py-3 text-xs">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-slate-700" />
+          <span className="font-bold text-slate-900">
+            Stakeholder Sentiment Distribution
+          </span>
         </div>
-        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-          {overview.total} Comments
+        <span className="text-xs text-slate-500 font-medium">
+          Total Feedback: {overview.total}
         </span>
       </div>
 
-      {/* Donut Chart & Legend */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 py-4">
-        <div className="relative h-44 w-full flex items-center justify-center">
+      <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Recharts Pie */}
+        <div className="h-44 w-44 relative shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={46}
+                outerRadius={68}
+                paddingAngle={3}
+                dataKey="value"
+                strokeWidth={1}
+                stroke="#fff"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
-                    const data = payload[0].payload;
+                    const d = payload[0].payload;
                     return (
-                      <div className="rounded-lg border border-slate-700 bg-slate-900 p-2 text-xs shadow-xl text-slate-200">
-                        <span className="font-semibold">{data.name}: </span>
-                        <span>{data.value} comments ({data.pct}%)</span>
+                      <div className="rounded-lg border border-slate-200 bg-white p-2.5 text-xs shadow-md">
+                        <div className="font-semibold text-slate-900">{d.name}</div>
+                        <div className="text-slate-600">
+                          {d.value} submissions ({d.pct}%)
+                        </div>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={48}
-                outerRadius={68}
-                paddingAngle={4}
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
             </PieChart>
           </ResponsiveContainer>
 
-          <div className="absolute flex flex-col items-center justify-center text-center pointer-events-none">
-            <span className="text-lg font-bold text-white">
-              {overview.total}
+          {/* Center Metric */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-xl font-bold tracking-tight text-slate-900">
+              {overview.positive_pct}%
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-slate-400">
-              Total
+            <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
+              Support
             </span>
           </div>
         </div>
 
-        {/* Legend with progress indicators */}
-        <div className="space-y-3">
-          {/* Positive */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-medium text-emerald-400">
-                <Smile className="h-3.5 w-3.5" />
-                Positive Support
-              </span>
-              <span className="text-slate-300 font-semibold">
-                {overview.positive} ({overview.positive_pct}%)
-              </span>
-            </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-emerald-500"
-                style={{ width: `${overview.positive_pct}%` }}
-              />
-            </div>
+        {/* Legend / Breakdown List */}
+        <div className="w-full space-y-3">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
+            {chartData.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-slate-700 font-medium">{item.name}</span>
+                </div>
+                <div className="flex items-center gap-2 font-semibold text-slate-900">
+                  <span>{item.value}</span>
+                  <span className="text-[11px] text-slate-500 font-normal">
+                    ({item.pct}%)
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Neutral */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-medium text-amber-400">
-                <MinusCircle className="h-3.5 w-3.5" />
-                Neutral / Balanced
-              </span>
-              <span className="text-slate-300 font-semibold">
-                {overview.neutral} ({overview.neutral_pct}%)
-              </span>
-            </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-amber-500"
-                style={{ width: `${overview.neutral_pct}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Negative */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-medium text-rose-400">
-                <Frown className="h-3.5 w-3.5" />
-                Concerns Raised
-              </span>
-              <span className="text-slate-300 font-semibold">
-                {overview.negative} ({overview.negative_pct}%)
-              </span>
-            </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-rose-500"
-                style={{ width: `${overview.negative_pct}%` }}
-              />
-            </div>
-          </div>
+          <p className="text-[11px] text-slate-500 leading-relaxed">
+            Sentiment is evaluated across all consultation submissions using statutory sentiment classification models.
+          </p>
         </div>
       </div>
     </div>

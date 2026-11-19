@@ -7,6 +7,7 @@ from app.db.session import init_db
 from app.api.document import router as document_router
 from app.api.analysis import router as analysis_router
 from app.api.dashboard import router as dashboard_router
+from app.api.batch import router as batch_router
 
 
 @asynccontextmanager
@@ -52,8 +53,10 @@ def health():
 app.include_router(document_router, prefix=settings.API_PREFIX)
 app.include_router(analysis_router, prefix=settings.API_PREFIX)
 app.include_router(dashboard_router, prefix=settings.API_PREFIX)
+app.include_router(batch_router, prefix=settings.API_PREFIX)
 
 # Also mount under /api for convenience
 app.include_router(document_router, prefix="/api")
 app.include_router(analysis_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
+app.include_router(batch_router, prefix="/api")

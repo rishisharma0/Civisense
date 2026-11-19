@@ -10,6 +10,7 @@ class DocumentBase(BaseModel):
 class DocumentUploadResponse(BaseModel):
     document_id: UUID
     filename: str
+    status: str = "pending"
     uploaded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -18,6 +19,7 @@ class DocumentUploadResponse(BaseModel):
 class DocumentResponse(BaseModel):
     document_id: UUID
     filename: str
+    status: str = "pending"
     uploaded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
